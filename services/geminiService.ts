@@ -1,10 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
 
-// FIX: Switched from `import.meta.env.VITE_API_KEY` to `process.env.API_KEY` to follow coding guidelines and fix the TypeScript error.
+// Fix: Per coding guidelines, API key must be retrieved from process.env.API_KEY.
 const apiKey = process.env.API_KEY;
 
 if (!apiKey) {
-  // Este erro será lançado durante o desenvolvimento se a chave não estiver no .env
+  // Este erro será lançado durante o desenvolvimento se a chave não estiver configurada.
   // Em produção (Vercel), a ausência da variável fará o build falhar, o que é um bom controle.
   throw new Error("API_KEY não está definida. Verifique seu arquivo .env ou as configurações de ambiente da Vercel.");
 }
