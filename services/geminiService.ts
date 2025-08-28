@@ -1,10 +1,18 @@
 import { GoogleGenAI } from "@google/genai";
 
-export const askOracle = async (question: string): Promise<string> => {
-  // Fix: The API key must be obtained from `process.env.API_KEY` and used directly.
-  // The API key's availability is a hard requirement and should not be checked in the code.
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// FIX: Per coding guidelines, the API key must be obtained from process.env.API_KEY.
+// This also resolves the error "Property 'env' does not exist on type 'ImportMeta'".
+const apiKey = process.env.API_KEY;
 
+if (!apiKey) {
+  // Este erro será lançado durante o desenvolvimento se a chave não estiver no .env.local
+  // Em produção (Vercel), a ausência da variável fará o build falhar, o que é um bom controle.
+  throw new Error("API_KEY não está definida. Verifique seu arquivo .env ou as configurações de ambiente.");
+}
+
+const ai = new GoogleGenAI({ apiKey });
+
+export const askOracle = async (question: string): Promise<string> => {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -17,7 +25,7 @@ export const askOracle = async (question: string): Promise<string> => {
     return response.text;
   } catch (error) {
     console.error("Erro ao contatar o Oráculo da Gemini:", error);
-    // Retorna um erro genérico para outras falhas na API.
+    // Lança um erro específico que o componente pode capturar e tratar
     throw new Error("ORACLE_API_ERROR");
   }
 };

@@ -3,47 +3,48 @@ import { askOracle } from '../services/geminiService';
 
 const Oracle: React.FC = () => {
   const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [response, setResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Fix: Removed API key check from UI. As per guidelines, the API key is assumed to be configured and valid externally.
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim() || isLoading) return;
 
     setIsLoading(true);
-    setAnswer(null);
-    setError(null);
+    setError('');
+    setResponse('');
+
     try {
       const oracleResponse = await askOracle(question);
-      setAnswer(oracleResponse);
-    } catch (err: any) {
-        setError('O cosmos está em silêncio... O Oráculo não pôde ser contatado. Tente novamente quando as estrelas se alinharem.');
+      setResponse(oracleResponse);
+    } catch (err) {
+      console.error(err);
+      setError('O cosmos está em silêncio... O Oráculo não pôde ser contatado. Tente novamente quando as estrelas se alinharem.');
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
-
+  
   return (
     <div className="max-w-4xl mx-auto my-16 sm:my-24 p-8 bg-slate-800/50 rounded-xl shadow-2xl shadow-purple-500/10 border border-slate-700">
-      <h2 className="text-3xl font-bold text-center text-purple-400">Consulte o Oráculo Cósmico</h2>
-      <p className="text-center text-slate-400 mt-2 mb-6">Faça uma pergunta sobre os grandes mistérios e receba uma resposta enigmática.</p>
+      <h2 className="text-3xl font-bold text-purple-400 text-center">Consulte o Oráculo Cósmico</h2>
+      <p className="text-center text-slate-400 mt-2 mb-8">Faça uma pergunta sobre os grandes mistérios e receba uma resposta enigmática.</p>
       
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
         <input
           type="text"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Ex: Qual o segredo das estrelas?"
-          className="flex-grow bg-slate-900 border border-slate-700 rounded-md py-3 px-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all disabled:opacity-50"
+          placeholder={isLoading ? "Aguardando os astros..." : "Qual o segredo das pirâmides?"}
+          className="flex-grow bg-slate-800 border border-slate-600 rounded-md py-3 px-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all"
+          aria-label="Pergunta para o Oráculo Cósmico"
           disabled={isLoading}
-          aria-label="Pergunta para o Oráculo"
         />
         <button
           type="submit"
-          disabled={isLoading}
-          className="bg-purple-600 text-white font-bold py-3 px-6 rounded-md hover:bg-purple-500 transition-all duration-300 transform hover:scale-105 disabled:bg-slate-600 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center"
+          disabled={isLoading || !question.trim()}
+          className="bg-purple-600 text-white font-bold py-3 px-6 rounded-md hover:bg-purple-500 transition-all duration-300 transform hover:scale-105 disabled:bg-slate-700 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center"
         >
           {isLoading ? (
             <>
@@ -60,14 +61,14 @@ const Oracle: React.FC = () => {
       </form>
 
       {error && (
-        <div className="mt-8 p-6 bg-slate-900/70 border-l-4 border-red-500 rounded-r-lg">
-          <p className="text-red-400 italic whitespace-pre-wrap font-serif text-lg">{error}</p>
+        <div className="mt-6 p-4 bg-red-900/30 border-l-4 border-red-500 rounded-r-lg animate-fade-in" role="alert">
+          <p className="text-red-400 font-semibold">{error}</p>
         </div>
       )}
 
-      {answer && (
-        <div className="mt-8 p-6 bg-slate-900/70 border-l-4 border-purple-500 rounded-r-lg">
-          <p className="text-slate-300 italic whitespace-pre-wrap font-serif text-lg">{answer}</p>
+      {response && (
+        <div className="mt-6 p-6 bg-slate-900/70 border-l-4 border-purple-500 rounded-r-lg animate-fade-in">
+          <p className="text-slate-300 italic font-serif text-lg whitespace-pre-wrap">{response}</p>
         </div>
       )}
     </div>
