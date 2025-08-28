@@ -1,14 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 
-// FIX: Per coding guidelines, the API key must be retrieved from `process.env.API_KEY`.
-// Using `import.meta.env` is incorrect and was causing a TypeScript error.
+// Fix: Per coding guidelines, the API key must be retrieved from process.env.API_KEY. This resolves the TypeScript error with `import.meta.env`.
 const apiKey = process.env.API_KEY;
 
 if (!apiKey) {
-  // Este erro é crucial para a depuração. Ele informa ao desenvolvedor que a 
-  // variável de ambiente não está configurada corretamente no ambiente Vercel/local.
-  // A variável DEVE se chamar API_KEY.
-  throw new Error("A variável de ambiente API_KEY não está definida. Por favor, certifique-se de que ela está configurada no seu ambiente.");
+  // This error message is crucial. If it appears, it means that the API key has not been configured correctly in the hosting platform.
+  // The environment variable name must be exactly API_KEY.
+  throw new Error("The environment variable API_KEY is not configured. Please add it in your project settings.");
 }
 
 const ai = new GoogleGenAI({ apiKey });
