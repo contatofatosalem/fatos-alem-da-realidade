@@ -1,13 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 
-// FIX: Per coding guidelines, the API key must be obtained from process.env.API_KEY.
-// This also resolves the error "Property 'env' does not exist on type 'ImportMeta'".
+// FIX: Switched from `import.meta.env.VITE_API_KEY` to `process.env.API_KEY` to follow coding guidelines and fix the TypeScript error.
 const apiKey = process.env.API_KEY;
 
 if (!apiKey) {
-  // Este erro será lançado durante o desenvolvimento se a chave não estiver no .env.local
+  // Este erro será lançado durante o desenvolvimento se a chave não estiver no .env
   // Em produção (Vercel), a ausência da variável fará o build falhar, o que é um bom controle.
-  throw new Error("API_KEY não está definida. Verifique seu arquivo .env ou as configurações de ambiente.");
+  throw new Error("API_KEY não está definida. Verifique seu arquivo .env ou as configurações de ambiente da Vercel.");
 }
 
 const ai = new GoogleGenAI({ apiKey });
