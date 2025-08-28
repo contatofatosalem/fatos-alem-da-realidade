@@ -1,14 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 
 export const askOracle = async (question: string): Promise<string> => {
-  const apiKey = process.env.API_KEY;
-
-  if (!apiKey) {
-    // Lança um erro específico para a UI capturar e tratar adequadamente.
-    throw new Error("API_KEY_MISSING");
-  }
-
-  const ai = new GoogleGenAI({ apiKey });
+  // Fix: The API key must be obtained from `process.env.API_KEY` and used directly.
+  // The API key's availability is a hard requirement and should not be checked in the code.
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   try {
     const response = await ai.models.generateContent({

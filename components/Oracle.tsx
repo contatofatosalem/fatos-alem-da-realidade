@@ -7,12 +7,11 @@ const Oracle: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Verifica a ausência da API Key para controlar o estado da UI.
-  const isApiKeyMissing = !process.env.API_KEY;
+  // Fix: Removed API key check from UI. As per guidelines, the API key is assumed to be configured and valid externally.
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!question.trim() || isLoading || isApiKeyMissing) return;
+    if (!question.trim() || isLoading) return;
 
     setIsLoading(true);
     setAnswer(null);
@@ -21,11 +20,7 @@ const Oracle: React.FC = () => {
       const oracleResponse = await askOracle(question);
       setAnswer(oracleResponse);
     } catch (err: any) {
-        if (err.message === 'API_KEY_MISSING') {
-             setError('A chave da API Gemini não foi encontrada. Configure a variável de ambiente `API_KEY`.');
-        } else {
-            setError('O cosmos está em silêncio... O Oráculo não pôde ser contatado. Tente novamente quando as estrelas se alinharem.');
-        }
+        setError('O cosmos está em silêncio... O Oráculo não pôde ser contatado. Tente novamente quando as estrelas se alinharem.');
     }
     setIsLoading(false);
   };
@@ -40,14 +35,14 @@ const Oracle: React.FC = () => {
           type="text"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder={isApiKeyMissing ? "Oráculo desativado - configure a API Key" : "Ex: Qual o segredo das estrelas?"}
+          placeholder="Ex: Qual o segredo das estrelas?"
           className="flex-grow bg-slate-900 border border-slate-700 rounded-md py-3 px-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all disabled:opacity-50"
-          disabled={isLoading || isApiKeyMissing}
+          disabled={isLoading}
           aria-label="Pergunta para o Oráculo"
         />
         <button
           type="submit"
-          disabled={isLoading || isApiKeyMissing}
+          disabled={isLoading}
           className="bg-purple-600 text-white font-bold py-3 px-6 rounded-md hover:bg-purple-500 transition-all duration-300 transform hover:scale-105 disabled:bg-slate-600 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center"
         >
           {isLoading ? (
@@ -59,19 +54,10 @@ const Oracle: React.FC = () => {
               Consultando...
             </>
           ) : (
-            isApiKeyMissing ? 'Oráculo Desativado' : 'Perguntar'
+            'Perguntar'
           )}
         </button>
       </form>
-
-      {isApiKeyMissing && (
-        <div className="mt-8 p-6 bg-slate-900/70 border-l-4 border-amber-500 rounded-r-lg">
-          <h4 className="font-bold text-amber-300">Atenção: Ação Necessária</h4>
-          <p className="text-slate-300 mt-2">
-            Para ativar o Oráculo Cósmico, você precisa obter uma Chave de API (API Key) do <strong>Google AI Studio</strong> e configurá-la como uma variável de ambiente chamada <code className="bg-slate-700 text-amber-300 px-1 py-0.5 rounded">API_KEY</code> na sua plataforma de hospedagem (ex: Vercel, Netlify).
-          </p>
-        </div>
-      )}
 
       {error && (
         <div className="mt-8 p-6 bg-slate-900/70 border-l-4 border-red-500 rounded-r-lg">
